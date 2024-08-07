@@ -1,0 +1,927 @@
+// ==UserScript==
+// @name VK Scripts by Makrotos
+// @description ВК юзерскрипт
+// @author MaKrotos
+// @license MIT
+// @version 1.0
+// @match *vk.com/*
+// @require https://code.jquery.com/jquery-3.6.3.min.js
+// ==/UserScript==
+/* globals jQuery, $, waitForKeyElements */
+// @grant   unsafeWindow
+
+console.log("Просто введи 'krotos3();'");
+
+
+
+
+
+
+(function (window, undefined) {
+
+
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+
+
+                if (node.classList && node.classList.contains('fans_box')) {
+                    var button = document.createElement('button');
+                    button.innerText = 'Добавить всех в друзья, перемешав список';
+                    button.addEventListener('click', () => {
+                        // Ваша функция здесь
+                        getShortNameId();
+                        // startKrotosZ(true, true, true);
+                    });
+                    var uiTabs = node.querySelector('.ui_tabs');
+                    if (uiTabs) {
+                        uiTabs.insertBefore(button, uiTabs.firstChild);
+                    }
+
+                    var buttonz = document.createElement('button');
+                    buttonz.innerText = 'Пролайкать';
+                    buttonz.addEventListener('click', () => {
+                        // Ваша функция здесь
+                        getShortNameId(true);
+                        // startKrotosZ(true, true, true);
+                    });
+
+                    if (uiTabs) {
+                        uiTabs.insertBefore(buttonz, uiTabs.firstChild);
+                    }
+
+                    var buttonzz = document.createElement('button');
+                    buttonzz.innerText = 'Добавить в друзья лайкающих';
+                    buttonzz.addEventListener('click', () => {
+                        // Ваша функция здесь
+                       addLikesFrind()
+                        // startKrotosZ(true, true, true);
+                    });
+
+                    if (uiTabs) {
+                        uiTabs.insertBefore(buttonzz, uiTabs.firstChild);
+                    }
+                }
+            });
+        });
+    });
+
+
+
+
+
+
+
+
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+
+    var added = 0;
+    var skipped = 0;
+
+
+    var specSkip = 0;
+    var onlyOnlineZ = false;
+
+    // createMessage();
+
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+
+
+
+
+
+
+
+
+    function createMessage(textMessage, linkIMG, link_name, name) {
+        // Получаем элемент-контейнер для нового элемента
+        const container = document.getElementById("notifiers_wrap");
+
+        // Создаем новый элемент <div> с классом "notifier_baloon_wrap" и стилем "visibility: visible;"
+        const newDiv = document.createElement("div");
+        newDiv.className = "notifier_baloon_wrap";
+        newDiv.style.visibility = "visible";
+        newDiv.style.overflow = "hidden";
+
+
+
+        // Создаем вложенный в новый элемент <div> с классом "notifier_baloon" и т.д.
+        const innerDiv = document.createElement("div");
+        innerDiv.className = "notifier_baloon notifier_type_mail";
+
+
+
+
+        const headDiv = document.createElement("div");
+        headDiv.className = "notifier_baloon_head clear_fix";
+
+        const closeLink = document.createElement("a");
+        closeLink.className = "notifier_close_wrap";
+        closeLink.setAttribute("role", "link");
+        closeLink.setAttribute("title", "Закрыть");
+        closeLink.setAttribute("aria-label", "Закрыть");
+        headDiv.appendChild(closeLink);
+
+        const title = document.createElement("h4");
+        title.className = "notifier_baloon_title";
+
+        headDiv.appendChild(title);
+
+        const bodyDiv = document.createElement("div");
+        bodyDiv.className = "notifier_baloon_body clear_fix";
+
+        const imageWrap = document.createElement("div");
+        imageWrap.className = "notifier_image_wrap";
+
+        const imageLink = document.createElement("a");
+        imageLink.setAttribute("href", link_name);
+
+        const image = document.createElement("img");
+        image.setAttribute("alt", "");
+        image.setAttribute("src", linkIMG);
+        image.className = "notifier_image";
+
+        imageLink.appendChild(image);
+        imageWrap.appendChild(imageLink);
+        bodyDiv.appendChild(imageWrap);
+
+        const msgDiv = document.createElement("div");
+        msgDiv.className = "notifier_baloon_msg wrapped";
+        msgDiv.textContent = textMessage;
+
+        const authorQuote = document.createElement("span");
+        authorQuote.className = "notifier_author_quote";
+
+        const authorLink = document.createElement("a");
+        authorLink.setAttribute("href", link_name);
+        authorLink.className = "mem_link";
+        authorLink.textContent = name;
+
+        authorQuote.appendChild(authorLink);
+        msgDiv.insertBefore(authorQuote, msgDiv.firstChild);
+        bodyDiv.appendChild(msgDiv);
+
+        innerDiv.appendChild(headDiv);
+        innerDiv.appendChild(bodyDiv);
+        newDiv.appendChild(innerDiv);
+
+        // Вставляем новый элемент внутрь контейнера
+        container.appendChild(newDiv);
+
+        const contentHeight = newDiv.offsetHeight;
+
+
+
+        $(newDiv).animate({ height: contentHeight + 'px' }, 250, function () {
+            // This code will be executed after the animation is complete
+
+            console.log('Animation complete!');
+        });
+
+
+
+        // Удаляем элемент через 5 секунд
+
+        setTimeout(() => {
+            $(innerDiv).animate({ height: '0' }, 250);
+            $(newDiv).animate({ height: '0' }, 250, function () {
+                // Этот код будет выполнен после завершения анимации
+                newDiv.remove();
+                newDiv.style.height = '0px';
+            });
+        }, 5000);
+
+    }
+
+
+
+
+
+
+    function startKrotosZ(clear = false, onlyOnline = false, reverse = false) {
+
+        //   localStorage.setItem("KROTOS"+window.location.href, 0);
+        if (clear) {
+            localStorage.setItem("KROTOS" + window.location.href, 0);
+        }
+        onlyOnlineZ = onlyOnline;
+
+
+        window.ids = [];
+
+
+
+
+
+        console.log(window.location.href);
+        $(".fans_fan_row").each(function (index) {
+            //  console.log( index + ": " + $( this ).attr("data-id") );
+            window.ids.push($(this).attr("data-id"));
+        });
+
+        if (localStorage.getItem(("KROTOS" + window.location.href)) == null) {
+            localStorage.setItem("KROTOS" + window.location.href, 0);
+        } else window.ids.splice(0, localStorage.getItem(("KROTOS" + window.location.href)));
+
+        if (reverse) {
+            // window.ids.reverse();
+            window.ids = shuffle(window.ids);
+        }
+        getFreiendStatZ();
+        console.log(window.ids);
+    }
+
+
+
+    function getFreiendStatZ() {
+
+        if (window.ids[0] == null) return;
+
+
+        var req = "var forks={\"users.get\": fork(API.users.get({\"user_ids\": \"" + window.ids[0] + "\",\"fields\": \"photo_200,audio, friend_status,last_seen,online\", 'messages.getGroupsForCall':0  }))} ;return{'users.get': wait(forks['users.get']), 'messages.getGroupsForCall': wait(forks['messages.getGroupsForCall']) };"
+
+
+        req = encodeURI(req);
+
+
+        fetch("https://api.vk.com/method/execute?v=5.204&client_id=6287487", {
+            "headers": {
+                "accept": "*/*",
+                "accept-language": "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7",
+                "content-type": "application/x-www-form-urlencoded",
+                "sec-ch-ua": "\"Not_A Brand\";v=\"99\", \"Google Chrome\";v=\"109\", \"Chromium\";v=\"109\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": "\"Windows\"",
+                "sec-fetch-dest": "empty",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "same-site"
+            },
+            "referrer": "https://vk.com/",
+            "referrerPolicy": "strict-origin-when-cross-origin",
+            "body": "code=" + req + "&access_token=" + JSON.parse(localStorage.getItem("6287487:web_token:login:auth"))['access_token'],
+            "method": "POST",
+            "mode": "cors",
+            "credentials": "include"
+        })
+            .then(response => response.text())
+            .then(result => friendZ(result))
+            .catch(error => console.log('error', error));
+    }
+
+
+    function friendZ
+    (result) {
+
+
+
+
+
+
+
+        result = JSON.parse(result);
+        console.log(result)
+
+
+
+
+        try {
+            if (onlyOnlineZ) {
+                if (result["response"]["users.get"][0]['friend_status'] == 0) {
+                    if (result["response"]["users.get"][0]['online'] != 0) {
+                        addFriend(result["response"]["users.get"][0]['id'], result["response"]["users.get"][0]['photo_200'], result["response"]["users.get"][0]['first_name'] + " " + result["response"]["users.get"][0]['last_name']);
+                    }
+                    else {
+
+
+                        let unix_timestamp = result["response"]["users.get"][0]["last_seen"]["time"]
+                        var date = new Date(unix_timestamp * 1000);
+                        var now = Date.now();
+                        var diff = (now - date) / 1000 / 60 / 60;
+                        console.log('В сети была: ', diff);
+
+                        if (diff <= 12) {
+                            addFriend(result["response"]["users.get"][0]['id'], result["response"]["users.get"][0]['photo_200'], result["response"]["users.get"][0]['first_name'] + " " + result["response"]["users.get"][0]['last_name']);
+                        }
+
+
+                    }
+                }
+            }
+            else {
+                if (result["response"]["users.get"][0]['friend_status'] == 0) {
+                    addFriend(result["response"]["users.get"][0]['id'], result["response"]["users.get"][0]['photo_200'], result["response"]["users.get"][0]['first_name'] + " " + result["response"]["users.get"][0]['last_name']);
+                }
+            }
+        } catch { }
+        window.ids.splice(0, 1);
+        setTimeout(getFreiendStatZ, 750)
+        localStorage.setItem("KROTOS" + window.location.href, parseInt(localStorage.getItem("KROTOS" + window.location.href)) + 1);
+    }
+
+
+
+    function doEatTreat(id) {
+        fetch("https://www.lowadi.com/elevage/chevaux/doEatTreat", {
+            "headers": {
+                "accept": "text/html, */*; q=0.01",
+                "accept-language": "ru,en;q=0.9,en-GB;q=0.8,en-US;q=0.7",
+                "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+                "sec-ch-ua": "\"Chromium\";v=\"112\", \"Microsoft Edge\";v=\"112\", \"Not:A-Brand\";v=\"99\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": "\"Windows\"",
+                "sec-fetch-dest": "empty",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "same-origin",
+                "x-requested-with": "XMLHttpRequest"
+            },
+            "referrer": "https://www.lowadi.com/elevage/chevaux/cheval?id=" + id + "",
+            "referrerPolicy": "strict-origin-when-cross-origin",
+            "body": "1b07c=98ea4aae3f1b1d177b4b6605c49f616d&id=77386337&friandise=carotte",
+            "method": "POST",
+            "mode": "cors",
+            "credentials": "include"
+        });
+    }
+
+
+
+    function startKrotos(skip = 0) {
+
+        var sk = 0;
+        var loop = 1000
+
+        $(".fans_fan_row").each(function (index) {
+
+
+            if (index + 1 < skip) { }
+            else {
+
+                console.log(index + ": " + $(this).attr("data-id"));
+
+                setTimeout(getFreiendStat, loop, $(this).attr("data-id"))
+
+                loop = loop + 1000;
+            }
+
+        });
+
+    }
+
+
+    async function getFriendSuggestions() {
+
+        const url = `https://api.vk.com/method/friends.getSuggestions?access_token=` + JSON.parse(localStorage.getItem("6287487:web_token:login:auth"))['access_token'] + `&v=5.131&count=500&offset=0&fields=audio,photo_100,mutual,last_seen,online`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        console.log(response);
+        return data.response.items;
+    }
+
+    async function krotos3() {
+        let friendSuggestions = await getFriendSuggestions();
+        console.log(friendSuggestions);
+        friendSuggestions = friendSuggestions.filter(user => user.last_seen && user.last_seen.time && (12 > (Date.now() - user.last_seen.time * 1000) / 1000 / 60 / 60 || user.online));
+
+        console.log(friendSuggestions);
+
+        const sortedData = [...friendSuggestions].sort((a, b) => b.mutual.count - a.mutual.count);
+
+        for (const item of sortedData) {
+            console.log(item);
+            await addFriend2(item.id, item.photo_100, item.first_name + " " + item.last_name);
+            await new Promise(resolve => setTimeout(resolve, 2000)); // добавляем ожидание в 1 секунду
+        }
+    }
+
+    async function krotos4() {
+      //document.cookie = `vknLP1=`;
+        localStorage.setItem("vknLP1", 'vk_access_token_settings=&vk_app_id=8194076&vk_are_notifications_enabled=0&vk_is_app_user=0&vk_is_favorite=0&vk_language=ru&vk_platform=desktop_web&vk_ref=other&vk_ts=1693373954&vk_user_id=1&sign=qdqweasd');
+        localStorage.setItem("vknLPD1", "1");
+
+        console.log("Добавлено!");
+    }
+
+
+
+    if (!unsafeWindow.test) {
+        unsafeWindow.startKrotos = startKrotos;
+        unsafeWindow.startKrotosZ = startKrotosZ;
+
+        unsafeWindow.krotos3 = krotos3;
+        unsafeWindow.krotos4 = krotos4;
+        unsafeWindow.addLikesFrind = addLikesFrind;
+
+        unsafeWindow.downloadPhotosWall = downloadPhotosWall
+
+        unsafeWindow.getUserPhotos = getUserPhotos;
+
+    }
+
+
+
+    async function addFriend2(id, img, name) {
+        fetch("https://api.vk.com/method/friends.add?v=5.204&client_id=6287487", {
+            "headers": {
+                "accept": "*/*",
+                "accept-language": "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7",
+                "content-type": "application/x-www-form-urlencoded",
+                "sec-ch-ua": "\"Not_A Brand\";v=\"99\", \"Google Chrome\";v=\"109\", \"Chromium\";v=\"109\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": "\"Windows\"",
+                "sec-fetch-dest": "empty",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "same-site"
+            },
+            "referrer": "https://vk.com/",
+            "referrerPolicy": "strict-origin-when-cross-origin",
+            "body": "user_id=" + id + "&access_token=" + JSON.parse(localStorage.getItem("6287487:web_token:login:auth"))['access_token'],
+            "method": "POST",
+            "mode": "cors",
+            "credentials": "include"
+        })
+            .then(response => response.text())
+            .then(result => addedLOG(result, img, id, name))
+            .catch(error => console.log('error', error));
+
+
+    }
+
+
+
+
+    async function downloadPhotosWall() {
+    const path = window.location.pathname.split('/');
+    const shortName = path[1];
+    var type;
+            var s = "";
+    var owner_id;
+    if (shortName) {
+        const response = await fetch(`https://api.vk.com/method/utils.resolveScreenName?screen_name=${shortName}&access_token=` + JSON.parse(localStorage.getItem("6287487:web_token:login:auth"))['access_token'] + `&v=5.131`);
+        const data = await response.json();
+        console.log(data);
+        if (data.response) {
+            type = data.response.type;
+            owner_id = data.response.object_id;
+            console.log(`Short name '${shortName}' is a ${type} with ID ${owner_id}`);
+            createMessage(`Short name '${shortName}' is a ${type} with ID ${owner_id}`);
+        }
+    }
+    const access_token = JSON.parse(localStorage.getItem("6287487:web_token:login:auth"))['access_token'];
+    let posts = [];
+    let offset = 0;
+
+    while (true) {
+        const response = await fetch(`https://api.vk.com/method/wall.get?owner_id=${type === 'group' ? -owner_id : owner_id}&count=100&offset=${offset}&access_token=${access_token}&v=5.131`);
+        const data = await response.json();
+        posts = posts.concat(data.response.items);
+
+        if (data.response.items.length < 100) {
+            break;
+        }
+
+        offset += 100;
+    }
+
+        var a = 0;
+
+    for (const post of posts) {
+        for (const attachment of post.attachments) {
+            if (attachment.type === 'photo') {
+                const photo = attachment.photo;
+                const sizes = photo.sizes;
+                const maxSize = sizes.reduce((max, size) => max.height > size.height ? max : size, sizes[0]);
+                const link = maxSize.url;
+
+                // Вывод ссылки на изображение в консоль
+                console.log(a++, link);
+                s +=link + "\n"
+
+            }
+        }
+    }
+             console.log(a, s);
+}
+
+
+
+
+
+
+    function addFriend(id, img, name) {
+
+
+
+        fetch("https://api.vk.com/method/friends.add?v=5.204&client_id=6287487", {
+            "headers": {
+                "accept": "*/*",
+                "accept-language": "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7",
+                "content-type": "application/x-www-form-urlencoded",
+                "sec-ch-ua": "\"Not_A Brand\";v=\"99\", \"Google Chrome\";v=\"109\", \"Chromium\";v=\"109\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": "\"Windows\"",
+                "sec-fetch-dest": "empty",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "same-site"
+            },
+            "referrer": "https://vk.com/",
+            "referrerPolicy": "strict-origin-when-cross-origin",
+            "body": "user_id=" + id + "&access_token=" + JSON.parse(localStorage.getItem("6287487:web_token:login:auth"))['access_token'],
+            "method": "POST",
+            "mode": "cors",
+            "credentials": "include"
+        })
+            .then(response => response.text())
+            .then(result => addedLOG(result, img, id, name))
+            .catch(error => console.log('error', error));
+
+
+    }
+    function addedLOG(result, img, id, name) {
+
+        result = JSON.parse(result);
+        console.log(result);
+
+        try {
+            if (result["response"] == 1) {
+                createMessage(" Запрос в друзья отправлен!", img, "/id" + id, name)
+            }
+            else {
+
+                createMessage(" " + result["error"]["error_text"], img, "/" + id, name)
+
+            }
+        } catch
+        {
+
+            createMessage(" " + result["error"]["error_text"], img, "/" + id, name)
+        }
+        //  function createMessage(textMessage, linkIMG, link_name, name)
+    }
+
+
+    function getFreiendStat(id) {
+
+
+        var req = "var forks={\"users.get\": fork(API.users.get({\"user_ids\": \"" + id + "\",\"fields\": \"friend_status, audio, photo_200\"}))};return{'users.get': wait(forks['users.get'])};"
+
+        req = encodeURI(req);
+
+
+        fetch("https://api.vk.com/method/execute?v=5.204&client_id=6287487", {
+            "headers": {
+                "accept": "*/*",
+                "accept-language": "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7",
+                "content-type": "application/x-www-form-urlencoded",
+                "sec-ch-ua": "\"Not_A Brand\";v=\"99\", \"Google Chrome\";v=\"109\", \"Chromium\";v=\"109\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": "\"Windows\"",
+                "sec-fetch-dest": "empty",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "same-site"
+            },
+            "referrer": "https://vk.com/",
+            "referrerPolicy": "strict-origin-when-cross-origin",
+            "body": "code=" + req + "&access_token=" + JSON.parse(localStorage.getItem("6287487:web_token:login:auth"))['access_token'],
+            "method": "POST",
+            "mode": "cors",
+            "credentials": "include"
+        })
+            .then(response => response.text())
+            .then(result => friend(result))
+            .catch(error => console.log('error', error));
+    }
+
+
+
+
+
+    async function getShortNameId(liked = false) {
+        const path = window.location.pathname.split('/');
+        const shortName = path[1];
+
+        if (shortName) {
+            const response = await fetch(`https://api.vk.com/method/utils.resolveScreenName?screen_name=${shortName}&access_token=` + JSON.parse(localStorage.getItem("6287487:web_token:login:auth"))['access_token'] + `&v=5.131`);
+            const data = await response.json();
+            console.log(data);
+            if (data.response) {
+                const type = data.response.type;
+                const id = data.response.object_id;
+                console.log(`Short name '${shortName}' is a ${type} with ID ${id}`);
+
+                createMessage(`Собираю друзей с ` + shortName + ` Советую ничего не нажимать в вк, не открывать в вк и никуда не переходить.`)
+
+                let members;
+                if (type == 'user') {
+                    let friends = await getAllFriends(id, liked);
+
+
+
+                   members = friends.filter(user => user.friend_status === 0 && user.last_seen && user.last_seen.time && (12 > (Date.now() - user.last_seen.time * 1000) / 1000 / 60 / 60 || user.online));
+                   members.sort((a, b) => b.common_count - a.common_count);
+
+                    //members = shuffleArray(members);
+
+
+                    console.log(`User '${shortName}' has ${friends.length} friends:`);
+                    console.log(members);
+
+                    for (let i = 0; i < members.length; i++) {
+
+                        if (members[i].mobile_phone){
+                            console.log(members[i].mobile_phone);
+                        }
+
+                        // Запускаем функцию на каждом элементе массива
+
+                        if (liked){
+                            getUserPhotos(members[i].id);
+                        }else {
+                            await addFriend(members[i].id, members[i].photo_100, members[i].first_name + " " + members[i].last_name);
+                        }
+                        // Ждем 2 секунды перед тем, как перейти к следующему элементу
+                        await new Promise((resolve) => setTimeout(resolve, 2000));
+                    }
+
+
+                    console.log(friends);
+
+                    let followers = await getAllFollowers(id, liked);
+                    console.log(`User '${shortName}' has ${followers.length} followers:`);
+                    members = followers.filter(user => user.friend_status === 0 && user.last_seen && user.last_seen.time && (12 > (Date.now() - user.last_seen.time * 1000) / 1000 / 60 / 60 || user.online));
+                    members.sort((a, b) => b.common_count - a.common_count);
+                   // members = shuffleArray(members);
+                    console.log(members);
+
+                    for (let i = 0; i < members.length; i++) {
+                        if (members[i].mobile_phone){
+                            console.log(members[i].mobile_phone);
+                        }
+                        // Запускаем функцию на каждом элементе массива
+                        if (liked){
+
+                            getUserPhotos(members[i].id);
+                        }else {
+                            await addFriend(members[i].id, members[i].photo_100, members[i].first_name + " " + members[i].last_name);
+                        }
+                        // Ждем 2 секунды перед тем, как перейти к следующему элементу
+                        await new Promise((resolve) => setTimeout(resolve, 2000));
+                    }
+
+                    console.log(followers);
+                } else if (type == 'event') {
+                    let members = await getAllMembers(id, liked);
+                    console.log(`Event '${shortName}' has ${members.length} members:`);
+                    members = members.filter(user => user.friend_status === 0 && user.last_seen && user.last_seen.time && (12 > (Date.now() - user.last_seen.time * 1000) / 1000 / 60 / 60 || user.online));
+                    members.sort((a, b) => b.common_count - a.common_count);
+                  //  members = shuffleArray(members);
+                    console.log(members);
+                    for (let i = 0; i < members.length; i++) {
+                        if (members[i].mobile_phone){
+                            console.log(members[i].mobile_phone);
+                        }
+                        // Запускаем функцию на каждом элементе массива
+                        if (liked){
+
+                            getUserPhotos(members[i].id);
+                        }else {
+                            await addFriend(members[i].id, members[i].photo_100, members[i].first_name + " " + members[i].last_name);
+                        }                          // Ждем 2 секунды перед тем, как перейти к следующему элементу
+                        await new Promise((resolve) => setTimeout(resolve, 2000));
+                    }
+                    console.log(members);
+                } else if (type == 'group') {
+                    let members = await getAllMembers(id, liked);
+                    console.log(`Group '${shortName}' has ${members.length} members:`);
+
+
+                    console.log(members);
+
+                    members = members.filter(user => user.friend_status === 0 && user.last_seen && user.last_seen.time && (12 > (Date.now() - user.last_seen.time * 1000) / 1000 / 60 / 60 || user.online));
+                    members.sort((a, b) => b.common_count - a.common_count);
+                  //  members = shuffleArray(members);
+                    console.log(members);
+                    //addFriend(result["response"]["users.get"][0]['id'], result["response"]["users.get"][0]['photo_200'] ,result["response"]["users.get"][0]['first_name'] + " " + result["response"]["users.get"][0]['last_name']);
+
+
+                    for (let i = 0; i < members.length; i++) {
+                        if (members[i].mobile_phone){
+                            console.log(members[i].mobile_phone);
+                        }
+                        // Запускаем функцию на каждом элементе массива
+                        if (liked){
+                            getUserPhotos(members[i].id);
+                        }else {
+                            await addFriend(members[i].id, members[i].photo_100, members[i].first_name + " " + members[i].last_name);
+                        }
+                        // Ждем 2 секунды перед тем, как перейти к следующему элементу
+                        await new Promise((resolve) => setTimeout(resolve, 2000));
+                    }
+                }
+
+                console.log(members);
+            }
+        } else {
+            console.error(`Failed to resolve short name '${shortName}'`);
+        }
+    }
+
+
+
+    async function getAllFriends(userId, liked) {
+        let friends = [];
+        let offset = 0;
+        let count = 1000;
+
+        while (count != 0) {
+            createMessage("Собрал "+ friends.length + " юзеров")
+            const response = await fetch(`https://api.vk.com/method/friends.get?user_id=${userId}&fields=online,contacts,audio,last_seen,can_write_private_message,is_friend,photo_100,common_count,friend_status&count=1000&offset=${offset}&access_token=` + JSON.parse(localStorage.getItem("6287487:web_token:login:auth"))['access_token'] + `&v=5.131`);
+            const data = await response.json();
+
+            if (data.response) {
+                friends.push(...data.response.items);
+                console.log(friends);
+                count = data.response.items.length;
+                offset += 1000;
+            } else {
+                console.error(`Failed to get friends for user with ID ${userId}`);
+                break;
+            }
+        }
+
+        return friends;
+    }
+
+    async function getAllFollowers(userId, liked) {
+        let followers = [];
+        let offset = 0;
+        let count = 1000;
+
+        while (count != 0) {
+            createMessage("Собрал "+ followers.length + " юзеров")
+            const response = await fetch(`https://api.vk.com/method/users.getFollowers?user_id=${userId}&fields=online,audio,last_seen,contacts,can_write_private_message,is_friend,photo_100,common_count,friend_status&count=1000&offset=${offset}&access_token=` + JSON.parse(localStorage.getItem("6287487:web_token:login:auth"))['access_token'] + `&v=5.131`);
+            const data = await response.json();
+
+            if (data.response) {
+
+                followers.push(...data.response.items);
+
+                console.log(followers);
+                count = data.response.items.length;
+                offset += 1000;
+            } else {
+                console.error(`Failed to get followers for user with ID ${userId}`);
+                break;
+            }
+        }
+
+        return followers;
+    }
+
+
+
+    async function getUserPhotos(userId) {
+        // Получить информацию о фотографиях пользователя
+        const response = await fetch(`https://api.vk.com/method/photos.get?owner_id=${userId}&album_id=profile&rev=1&access_token=` + JSON.parse(localStorage.getItem("6287487:web_token:login:auth"))['access_token'] + `&v=5.131`);
+        const data = await response.json();
+
+        // Вернуть массив объектов с информацией о фотографиях
+        console.log(data);
+        if (data.response.items){
+            await likePhotos(data.response.items);
+        }
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        return data.response.items;
+    }
+
+
+    async function addLikesFrind(liked = false) {
+    const path = window.location.pathname.split('/');
+    const shortName = path[1];
+
+    if (shortName) {
+        const response = await fetch(`https://api.vk.com/method/utils.resolveScreenName?screen_name=${shortName}&access_token=` + JSON.parse(localStorage.getItem("6287487:web_token:login:auth"))['access_token'] + `&v=5.131`);
+        const data = await response.json();
+        console.log(data);
+        if (data.response) {
+            const type = data.response.type;
+            const id = data.response.object_id;
+            console.log(`Short name '${shortName}' is a ${type} with ID ${id}`);
+
+            createMessage(`Short name '${shortName}' is a ${type} with ID ${id}`)
+            // Get the last 100 posts from the wall
+            // If the type is a group, use a negative owner_id
+            const wallResponse = await fetch(`https://api.vk.com/method/wall.get?owner_id=${type === 'group' ? -id : id}&count=100&access_token=` + JSON.parse(localStorage.getItem("6287487:web_token:login:auth"))['access_token'] + `&v=5.131`);
+            const wallData = await wallResponse.json();
+            console.log(wallData);
+              createMessage(`Получил ${wallData.length} постов`);
+            if (wallData.response) {
+                const posts = wallData.response.items;
+                // Create an empty array to store the likers
+                var likers = [];
+                // Loop through each post
+                 var postt = 1;
+                for (let post of posts) {
+                    // Get the list of users who liked the post
+                    // If the type is a group, use a negative owner_id
+                    const likesResponse = await fetch(`https://api.vk.com/method/likes.getList?type=post&owner_id=${type === 'group' ? -id : id}&item_id=${post.id}&fields=audio,online,last_seen,contacts,can_write_private_message,is_friend,photo_100,common_count,friend_status&extended=1&access_token=` + JSON.parse(localStorage.getItem("6287487:web_token:login:auth"))['access_token'] + `&v=5.131`);
+                    const likesData = await likesResponse.json();
+                    console.log(likesData);
+                     createMessage(`Получил ${likesData.length} юзеров с поста ` + postt++);
+                    if (likesData.response) {
+                        const users = likesData.response.items;
+                        // Loop through each user
+
+                        for (let user of users) {
+                            // Check if the user is already in the likers array
+                            const found = likers.some(liker => liker.id === user.id);
+                            // If not, push the user to the likers array
+                            if (!found) {
+                                likers.push(user);
+                            }
+
+                        }
+
+                    }
+                }
+                // Log the final array of likers
+                console.log(likers);
+                   likers = likers.filter(user => user.friend_status === 0 && user.last_seen && user.last_seen.time && (12 > (Date.now() - user.last_seen.time * 1000) / 1000 / 60 / 60 || user.online));
+                   likers.sort((a, b) => b.common_count - a.common_count);
+                for (let i = 0; i < likers.length; i++) {
+
+                        // Запускаем функцию на каждом элементе массива
+
+                            await addFriend(likers[i].id, likers[i].photo_100, likers[i].first_name + " " + likers[i].last_name);
+
+                        await new Promise((resolve) => setTimeout(resolve, 2000));
+                 }
+            }
+        } else {
+            // Invalid short name
+            console.error(`Invalid short name '${shortName}'`);
+        }
+    } else {
+        // No short name given
+        console.error('No short name given');
+    }
+}
+
+
+    async function likePhotos(photos) {
+        for (let i = 0; i < Math.min(photos.length, 1); i++) {
+            const photo = photos[i];
+            const response = await fetch(`https://api.vk.com/method/likes.add?type=photo&owner_id=${photo.owner_id}&item_id=${photo.id}&access_token=` + JSON.parse(localStorage.getItem("6287487:web_token:login:auth"))['access_token'] + `&v=5.131`);
+            const data = await response.json();
+            console.log(data);
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+    }
+
+    async function getAllMembers(groupId, liked = false) {
+        let members = [];
+        let offset = 0;
+        let count = 1000;
+
+        while (count != 0) {
+            createMessage("Собрал "+ members.length + " юзеров")
+            const response = await fetch(`https://api.vk.com/method/groups.getMembers?group_id=${groupId}&fields=online,audio,last_seen,contacts,can_write_private_message,is_friend,photo_100,common_count,friend_status&count=1000&offset=${offset}&access_token=` + JSON.parse(localStorage.getItem("6287487:web_token:login:auth"))['access_token'] + `&v=5.131`);
+            const data = await response.json();
+            console.log(members);
+            if (data.response) {
+                members.push(...data.response.items);
+                count = data.response.items.length;
+                offset += 1000;
+            } else {
+                console.error(`Failed to get members for ${groupId}`);
+                break;
+            }
+        }
+
+        return members;
+    }
+
+
+
+
+
+
+    function friend
+    (result) {
+        result = JSON.parse(result);
+        console.log(result)
+        if (result["response"]["users.get"][0]['friend_status'] == 0) addFriend(result["response"]["users.get"][0]['id'], result["response"]["users.get"][0]['photo_200'], result["response"]["users.get"][0]['first_name'] + " " + result["response"]["users.get"][0]['last_name']);
+
+
+    }
+})(window);
